@@ -1,0 +1,257 @@
+1.
+In addition to API documentation and GUI, several other types of documentation can contribute to proper testing:
+-Requirements Documentations (User stories, Use cases, Acceptence criterias, Functional requirements documentation and any kind of documentation which is important for better understanding of product behaviours)
+-Environment Setup and Configuration (Document that includes important information about software versions, hardware specs etc.. )
+-Deployment and release process described in order to have better picture for setting testing processes
+
+2. In this concreate example i would identify two main components
+
+APIs
+Verify api endpoints are working as expected.
+This is the base level of application and without proper testing of api's we can not be sured that quaility is ensured.
+Importance: High
+
+UI
+Test the graphical user interface to ensure everything working smoothly from user perspective.
+UI is next layer and is also important to be propered tested. For real user having proper and user friendly ui is crucial.
+
+It's important to note that the hierarchy of importance may vary depending on the specific context and requirements of the application.
+
+Based on complexity of the application i would focused on mentioned areas. However by developing software other aspects are also important.
+
+Unit testing - Testing isolated method
+Performance testing - Test the software responsiveness, scalability, and overall performance.
+Security, Compatibility, Usability testing 
+ 
+ 
+ 3. Api testing approach
+ 
+ 
+ For test creation i would use jira tool but since i don't have access i will create test cases here (hope it won't be problem since it is not nice as in test management tool :) ). 
+
+Api
+The initial approach would be to test each endpoint separetely
+Testing on lower level can help us identify issues in early stage.
+
+Users:
+Test1_ID - Verify user is added successfully - Automated
+
+Test step: Execute endpoint POST https://thinking-tester-contact-list.herokuapp.com/users
+Test Data:{
+    "firstName": "Marko",
+    "lastName": "Markovic",
+    "email": "markomarko@123.com",
+    "password": "1234567"}
+Outcome: Verify status code 201 and check user is created with correct parameters
+
+Test2_ID - User is retrieved successfully from db
+Precondition: User is created
+Test step: Execute endpoint GET https://thinking-tester-contact-list.herokuapp.com/users/me
+Outcome: Verify status code 200 and retrieve data correspond to the passed user
+
+Test3_ID - Verify user is log in successfully - Automated
+Precondition:User is created
+Test step: Execute endpoint POST https://thinking-tester-contact-list.herokuapp.com/users/login
+Test Data:{
+    "email": "sergey@123.com",
+    "password": "1234567"}
+Outcome: Verify status code 200 and check user is logged in
+
+Test4_ID - Verify user is log out successfully - Automated
+Precondition: User is logged in
+Test step: Execute endpoint POST https://thinking-tester-contact-list.herokuapp.com/users/logout
+Outcome: Verify status code 200 
+
+
+Test5_ID - Verify user user data is updated
+Precondition: User is created
+Test step: Execute endpoint Patch https://thinking-tester-contact-list.herokuapp.com/users/me
+Test Data:{
+    "firstName": "Dejan",
+    "lastName": "Markovic",
+    "email": "markomarko@123.com",
+    "password": "1234567"}
+Outcome: Verify status code 200 and check user is updated with new parameters
+
+Test6_ID - Verify user is no longer exist in database - Automated
+Precondition: User is created
+Test step: Execute endpoint DELETE https://thinking-tester-contact-list.herokuapp.com/users/me
+Outcome: Verify status code 200 wit empty response
+
+Contacts:
+Test7_ID - Add contact for the user - Automated
+Precondtion: User is logged in
+Test step: Execute endpoint Post https://thinking-tester-contact-list.herokuapp.com/contacts
+Test Data:
+{    "firstName": "Sandra",
+    "lastName": "Milic",
+    "birthdate": "1970-01-01",
+    "email": "sandramilic@123.com",
+    "phone": "8005555555",
+    "street1": "1 Main St.",
+    "street2": "Apartment A",
+    "city": "Anytown",
+    "stateProvince": "KS",
+    "postalCode": "12345",
+    "country": "USA" }
+Outcome: Verify status code 201 and response body is correct
+
+Test8_ID - Retreive all contacts for the specific user - Automated
+Precondtion: User is logged in
+Execute: GET https://thinking-tester-contact-list.herokuapp.com/contacts
+Outcome: Status code 200, The expected contact/s is/are found. In case there are no contacts empty list should be returned
+
+Test9_ID -  Retreive specific contact for the specific user - Automated
+Precondtion: User is logged in and contact is assigned to the user
+Execute: Get https://thinking-tester-contact-list.herokuapp.com/contacts/{{contactId}}
+Outcome: Status code 200, The contact with passed id should be found
+
+Test10_ID - Update contact  for the specific user
+Precondtion: User is logged in and contact is assigned to the user
+Execute: PUT https://thinking-tester-contact-list.herokuapp.com/contacts/{{contactId}}
+Test Data: {
+    "firstName": "Amy",
+    "lastName": "Miller",
+    "birthdate": "1992-02-02",
+    "email": "amiller@fake.com",
+    "phone": "8005554242",
+    "street1": "13 School St.",
+    "street2": "Apt. 5",
+    "city": "Washington",
+    "stateProvince": "QC",
+    "postalCode": "A1A1A1",
+    "country": "Canada"
+}
+Outcome: Status code 200, The contact is updated with new parameters
+
+Test11_ID - Update specific contact info for the specific user - Automated
+Precondtion: User is logged in and contact is assigned to the user
+Execute: Patch https://thinking-tester-contact-list.herokuapp.com/contacts/{{contactId}}
+Test Data: {
+    "firstName": "Mona",
+}
+Outcome: Status code 200, The contact is updated with new first name
+
+Test12_ID -Delete contact for specific user - Automated
+Precondtion: User is logged in and contact is assigned to the user
+Execute: Delete https://thinking-tester-contact-list.herokuapp.com/contacts/{{contactId}}
+Outcome: Status code 200, The contact is deleted successfully
+
+Test13_ID Add new user with existing email
+Precondition: User is created
+Test step: Execute endpoint POST https://thinking-tester-contact-list.herokuapp.com/users
+Test data: Existing email
+Outocome: 400 Verify error message
+
+Test14_ID Log in with wrong credentials
+Precondition:User is created
+Test step: Execute endpoint POST https://thinking-tester-contact-list.herokuapp.com/users/login
+Data sets:
+1 iteration
+Test Data:{
+    "email": "gbffgbfg",
+    "password": "1234567"}
+Outcome: Verify status code 400 and check email is not in right format
+2 iteration
+Test Data:{
+    "email": "new@1234.com"
+    "password": "1234"}
+Outcome: Verify status code 400 and check password should contain at least 7 characters
+
+
+
+
+ 
+ 
+ UI testing
+
+Test26_ID Verify cancel button on user creation
+Test steps:
+1.Navigate to page following https://thinking-tester-contact-list.herokuapp.com/addUser 
+2. Click on sign up button
+2. Populated all fields with correct data (data sets created)
+3.Click on cancel
+4. Verify new page is open https://thinking-tester-contact-list.herokuapp.com/login
+
+Test15_ID User is registered successfully
+Test steps:
+1.Navigate to page following https://thinking-tester-contact-list.herokuapp.com/addUser 
+2. Click on sign up button
+2. Populated all fields with correct data (data sets created)
+3.Click on submit
+4. Verify user is added and new page is open https://thinking-tester-contact-list.herokuapp.com/contactList
+
+Test16_ID Verify user is not able to register with wrong email format and short password
+Test steps:
+1.Navigate to page following https://thinking-tester-contact-list.herokuapp.com/addUser 
+2. Populated all fields with correct data format and email with wrong format
+4. Verify error message is shown "User validation failed: email: Email is invalid"
+5. Enter correct email and update password to following value g12d33
+6. Verify following error message is shown "User validation failed: password: Path `password` g12d33 is shorter than the minimum allowed length" (7).
+
+Test17_ID User is log in successfully
+Test steps:
+1.Navigate to page following https://thinking-tester-contact-list.herokuapp.com/
+2. Enter email and password (data sets provided)
+3. Check user log in successfully and new page is open https://thinking-tester-contact-list.herokuapp.com/contactList
+
+Test18_ID Verify user is not able to log in
+Test steps:
+1.Navigate to page following https://thinking-tester-contact-list.herokuapp.com/
+2. Enter email and password in wrong format (data sets provided - different combinations empty fields, random values etc)
+3. Check error message is shown
+
+Test19_ID User is log out successfully
+Test steps:
+Precondition: User is log in Test17_ID
+1. Click on logout button
+2. Verify user is log out and new page is open https://thinking-tester-contact-list.herokuapp.com/
+
+Contacts
+
+Test20_ID Contact is created successfully
+Precondition: User is log in Test17_ID
+1.Click on Add a new Contact button
+2.Populate field in correct format (data set provided)
+3.Check contact is added (label and values verified)
+
+
+Test21_ID Verify Contact is not created created successfully
+Precondition: User is log in Test17_ID
+1.Click on Add a new Contact button
+2.Populate fields in incorrect format (data set provided (empty mandatory fields,email in not correct format etc)
+3.Check contact is not added and error is shown
+
+Test22_ID Contact is updated successfully
+Precondition: User is log in Test17_ID and contact is adedd - Test20_ID
+1.Double Click on contact name - Check new page is opened https://thinking-tester-contact-list.herokuapp.com/contactDetails 
+2 Click on Edit Contact 
+3. Update contact with new data (new data set) - Verify field/s is/are updated
+
+Test23_ID Contact is deleted successfully
+Precondition: User is log in Test17_ID and contact is adedd - Test20_ID
+1.Double Click on contact name - Check new page is opened https://thinking-tester-contact-list.herokuapp.com/contactDetails 
+2 Click on Delete Contact 
+4. Click on yes on pop up and check 
+5. Veify new page is open and contact is not avaialble in row
+
+Test24_ID Verify return to contact list button
+Precondition: User is log in Test17_ID and contact is adedd - Test20_ID
+1.Double Click on contact name - Check new page is opened https://thinking-tester-contact-list.herokuapp.com/contactDetails 
+2 Click on Return to Contact List 
+5. Veify new page is open and contact is avaialble in row
+
+
+Test25_ID Verify cancelletion button on adding contact
+Precondition: User is log in Test17_ID 
+1.Click on add contact
+2 Populate field (data set provided)
+3. CLick on cancel button
+5. Veify new page is open https://thinking-tester-contact-list.herokuapp.com/contactList
+
+
+
+
+
+
+
